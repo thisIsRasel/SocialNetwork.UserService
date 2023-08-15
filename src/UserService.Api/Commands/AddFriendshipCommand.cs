@@ -1,0 +1,16 @@
+﻿using MediatR;
+
+namespace UserService.Api.Commands;
+
+public class AddFriendshipCommand : IRequest
+{
+    public Guid UserId { get; private set; }
+
+    public Guid FriendUserId { get; private set; }
+
+    public AddFriendshipCommand(string userId, string friendUserId)
+    {
+        UserId = Guid.Parse(userId);
+        FriendUserId = Guid.Parse(friendUserId);
+    }
+}
