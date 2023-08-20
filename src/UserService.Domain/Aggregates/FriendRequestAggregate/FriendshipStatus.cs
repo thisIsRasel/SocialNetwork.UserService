@@ -1,4 +1,4 @@
-﻿namespace UserService.Domain.Aggregates.FriendAggregate;
+﻿namespace UserService.Domain.Aggregates.FriendRequestAggregate;
 
 public enum FriendshipStatus
 {

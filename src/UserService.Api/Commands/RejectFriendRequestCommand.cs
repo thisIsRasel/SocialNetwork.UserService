@@ -2,15 +2,15 @@
 
 namespace UserService.Api.Commands;
 
-public class AddFriendshipCommand : IRequest
+public class RejectFriendRequestCommand : IRequest
 {
     public Guid UserId { get; private set; }
 
     public Guid FriendUserId { get; private set; }
 
-    public AddFriendshipCommand(string userId, string friendUserId)
+    public RejectFriendRequestCommand(string userId, string friendUserId)
     {
         UserId = Guid.Parse(userId);
-        FriendUserId = Guid.Parse(friendUserId);
+        FriendUserId = Guid.Parse (friendUserId);
     }
 }

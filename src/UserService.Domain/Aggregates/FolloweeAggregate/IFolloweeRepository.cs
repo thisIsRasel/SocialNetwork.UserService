@@ -1,5 +1,8 @@
-﻿namespace UserService.Domain.Aggregates.FolloweeAggregate;
+﻿using UserService.Domain.SeedWork;
+
+namespace UserService.Domain.Aggregates.FolloweeAggregate;
 public interface IFolloweeRepository
+    : IRepository<Followee>
 {
     Task<Followee?> GetAsync(
         Guid userId,

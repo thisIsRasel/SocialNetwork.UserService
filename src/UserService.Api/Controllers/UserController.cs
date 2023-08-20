@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UserService.Api.Commands;
+using UserService.Api.Queries.GetFollowers;
+using UserService.Api.Queries.GetFriends;
 
 namespace UserService.Api.Controllers;
 
@@ -19,5 +22,43 @@ public class UserController : ControllerBase
     public async Task CreateAsync([FromBody] CreateUserCommand command)
     {
         await _mediator.Send(command);
+    }
+
+    [HttpGet("Friends")]
+    public async Task<IActionResult> GetFriendsAsync(
+        [FromQuery] string query,
+        [FromQuery] int page)
+    {
+        var userId = User.FindFirstValue("userId");
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest();
+        }
+
+        var result = await _mediator.Send(new GetFriendsQuery(
+            userId,
+            query: query,
+            page: page));
+
+        return Ok(result);
+    }
+
+    [HttpGet("Followers")]
+    public async Task<IActionResult> GetFollowersAsync(
+        [FromQuery] string query,
+        [FromQuery] int page)
+    {
+        var userId = User.FindFirstValue("userId");
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest();
+        }
+
+        var result = await _mediator.Send(new GetFollowersQuery(
+            userId,
+            query: query,
+            page: page));
+
+        return Ok(result);
     }
 }

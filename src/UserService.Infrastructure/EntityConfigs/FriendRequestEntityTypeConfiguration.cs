@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using UserService.Domain.Aggregates.UserAggregate;
+using UserService.Domain.Aggregates.FriendRequestAggregate;
 
 namespace UserService.Infrastructure.EntityConfigs;
-internal class FriendEntityTypeConfiguration
-    : IEntityTypeConfiguration<Friend>
+internal class FriendRequestEntityTypeConfiguration
+    : IEntityTypeConfiguration<FriendRequest>
 {
-    public void Configure(EntityTypeBuilder<Friend> builder)
+    public void Configure(EntityTypeBuilder<FriendRequest> builder)
     {
-        builder.ToTable("Friends");
+        builder.ToTable("FriendRequests");
         builder.Ignore(b => b.DomainEvents);
 
         builder.HasKey(x => x.Id);
@@ -17,5 +17,7 @@ internal class FriendEntityTypeConfiguration
         builder.Property(x => x.UserId).IsRequired();
         
         builder.Property(x => x.FriendUserId).IsRequired();
+        
+        builder.Property(x => x.Status).IsRequired();
     }
 }

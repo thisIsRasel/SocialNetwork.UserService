@@ -33,12 +33,14 @@ public class Followee : Entity, IAggregateRoot
         if (followee is null)
         {
             followee = new(userId, followeeUserId, FollowStatus.Followed);
+            followeeRepository.Add(followee);
             return followee;
         }
 
         if (followee.FollowStatus == FollowStatus.Unfollowed)
         {
             followee.FollowStatus = FollowStatus.Followed;
+            followeeRepository.Update(followee);
             return followee;
         }
 
@@ -52,6 +54,6 @@ public class Followee : Entity, IAggregateRoot
             throw new DomainException("User is already unfollowed");
         }
 
-        FollowStatus = FollowStatus.Followed;
+        FollowStatus = FollowStatus.Unfollowed;
     }
 }

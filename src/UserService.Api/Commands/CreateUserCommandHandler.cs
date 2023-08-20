@@ -1,21 +1,17 @@
 ﻿using MediatR;
 using UserService.Domain.Aggregates.UserAggregate;
-using UserService.Domain.SeedWork;
 
 namespace UserService.Api.Commands;
 
 public sealed class CreateUserCommandHandler
     : IRequestHandler<CreateUserCommand>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
 
     public CreateUserCommandHandler(
-        IUnitOfWork unitOfWork,
         IUserRepository userRepository)
     {
-        _unitOfWork = unitOfWork;
-        _userRepository = userRepository;
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
     public async Task Handle(
@@ -27,7 +23,9 @@ public sealed class CreateUserCommandHandler
             email: request.Email,
             userRepository: _userRepository);
 
-        await _userRepository.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _userRepository.Add(user);
+
+        await _userRepository.UnitOfWork
+            .SaveEntitiesAsync(cancellationToken);
     }
 }

@@ -12,7 +12,7 @@ using UserService.Infrastructure;
 namespace UserService.Infrastructure.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230809181456_InitialMigration")]
+    [Migration("20230819203225_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -45,7 +45,7 @@ namespace UserService.Infrastructure.Migrations
                     b.ToTable("Followees", (string)null);
                 });
 
-            modelBuilder.Entity("UserService.Domain.Aggregates.FriendAggregate.Friend", b =>
+            modelBuilder.Entity("UserService.Domain.Aggregates.FriendRequestAggregate.FriendRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,6 +61,25 @@ namespace UserService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.ToTable("FriendRequests", (string)null);
+                });
+
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Friend", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FriendUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Friends", (string)null);
                 });
@@ -82,6 +101,20 @@ namespace UserService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Friend", b =>
+                {
+                    b.HasOne("UserService.Domain.Aggregates.UserAggregate.User", null)
+                        .WithMany("Friends")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.User", b =>
+                {
+                    b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618
         }

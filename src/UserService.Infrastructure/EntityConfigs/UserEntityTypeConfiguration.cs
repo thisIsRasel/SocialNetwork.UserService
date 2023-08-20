@@ -9,14 +9,19 @@ internal class UserEntityTypeConfiguration
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
+        builder.Ignore(b => b.DomainEvents);
+
         builder.HasKey(u => u.Id);
+        builder.Property(u => u.Id).ValueGeneratedNever();
+
         builder.Property(u => u.Name).IsRequired();
+        
         builder.Property(u => u.Email).IsRequired();
 
-        //builder.HasMany(u => u.Friends)
-        //    .WithOne()
-        //    .HasForeignKey(u => u.UserId)
-        //    .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(u => u.Friends)
+            .WithOne()
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //builder.HasMany(u => u.Followees)
         //    .WithOne()

@@ -1,10 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UserService.Domain.Aggregates.FolloweeAggregate;
+using UserService.Domain.SeedWork;
 
 namespace UserService.Infrastructure.Repositories;
 internal class FolloweeRepository : IFolloweeRepository
 {
     private readonly UserDbContext _context;
+
+    public IUnitOfWork UnitOfWork => _context;
 
     public FolloweeRepository(UserDbContext context)
     {

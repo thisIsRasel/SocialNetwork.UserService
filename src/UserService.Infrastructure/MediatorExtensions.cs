@@ -4,7 +4,7 @@ using UserService.Domain.SeedWork;
 namespace UserService.Infrastructure;
 internal static class MediatorExtensions
 {
-    public static async void DispatchDomainEventsAsync(
+    public static async Task DispatchDomainEventsAsync(
         this IMediator mediator, UserDbContext ctx)
     {
         var domainEntities = ctx.ChangeTracker
