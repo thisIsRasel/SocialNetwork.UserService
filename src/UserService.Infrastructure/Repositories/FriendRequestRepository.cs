@@ -14,13 +14,15 @@ internal class FriendRequestRepository : IFriendRequestRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public async Task<FriendRequest?> GetAsync(
+    public async Task<FriendRequest?> GetPendingRequestAsync(
         Guid userId,
         Guid friendUserId)
     {
         var friend = await _context.FriendRequests
             .FirstOrDefaultAsync(x
-                => x.UserId == userId && x.FriendUserId == friendUserId);
+                => x.UserId == userId 
+                    && x.FriendUserId == friendUserId 
+                    && x.Status == FriendshipStatus.Pending);
 
         return friend;
     }

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using UserService.Domain.Aggregates.FolloweeAggregate;
 using UserService.Domain.Aggregates.FriendRequestAggregate;
 using UserService.Domain.Aggregates.UserAggregate;
+using UserService.Domain.Services;
 using UserService.Infrastructure.Repositories;
 
 namespace UserService.Infrastructure;
@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
-        services.AddScoped<IFolloweeRepository, FolloweeRepository>();
+
+        services.AddTransient<IFriendshipService, FriendshipService>();
 
         return services;
     }

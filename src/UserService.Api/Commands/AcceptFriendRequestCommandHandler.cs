@@ -19,7 +19,7 @@ public class AcceptFriendRequestCommandHandler
         CancellationToken cancellationToken)
     {
         var friendRequest = await _friendRequestRepository
-            .GetAsync(request.UserId, request.FriendUserId)
+            .GetPendingRequestAsync(request.UserId, request.FriendUserId)
             ?? throw new InvalidOperationException("Friendship does not exist");
 
         friendRequest.AcceptFriendRequest();

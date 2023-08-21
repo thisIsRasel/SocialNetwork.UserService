@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using UserService.Domain.Aggregates.FolloweeAggregate;
 using UserService.Domain.Aggregates.FriendRequestAggregate;
 using UserService.Domain.Aggregates.UserAggregate;
 using UserService.Domain.SeedWork;
@@ -21,7 +20,7 @@ public class UserDbContext : DbContext, IUnitOfWork
 
     public DbSet<Friend> Friends { get; set; }
 
-    public DbSet<Followee> Followees { get; set; }
+    public DbSet<Follower> Followers { get; set; }
 
     public DbSet<FriendRequest> FriendRequests { get; set; }
 
@@ -33,7 +32,7 @@ public class UserDbContext : DbContext, IUnitOfWork
 
         modelBuilder.ApplyConfiguration(new FriendEntityTypeConfiguration());
 
-        modelBuilder.ApplyConfiguration(new FolloweeEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new FollowerEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new FriendRequestEntityTypeConfiguration());
     }

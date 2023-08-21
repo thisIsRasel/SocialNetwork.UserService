@@ -19,7 +19,7 @@ public sealed class RejectFriendRequestCommandHandler
         CancellationToken cancellationToken)
     {
         var friend = await _friendRequestRepository
-            .GetAsync(request.UserId, request.FriendUserId)
+            .GetPendingRequestAsync(request.UserId, request.FriendUserId)
             ?? throw new InvalidOperationException("User is not a friend");
 
         friend.RejectFriendRequest();

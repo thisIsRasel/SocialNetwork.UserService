@@ -1,6 +1,7 @@
 ﻿using UserService.Domain.Events;
 using UserService.Domain.Exceptions;
 using UserService.Domain.SeedWork;
+using UserService.Domain.Services;
 
 namespace UserService.Domain.Aggregates.FriendRequestAggregate;
 public class FriendRequest : Entity, IAggregateRoot
@@ -22,6 +23,7 @@ public class FriendRequest : Entity, IAggregateRoot
     public static async Task<FriendRequest> SendFriendRequestAsync(
         Guid userId,
         Guid friendUserId,
+        IFriendshipService friendshipService,
         IFriendRequestRepository friendRequestRepository)
     {
         if (userId == friendUserId)
@@ -29,46 +31,43 @@ public class FriendRequest : Entity, IAggregateRoot
             throw new DomainException("User can not send friend request to himself!");
         }
 
-        var friendRequest = await friendRequestRepository.GetAsync(userId, friendUserId);
+        if (await friendshipService.AreTheyFriendsAsync(userId, friendUserId))
+        {
+            throw new DomainException("These users are already friends");
+        }
+
+        var friendRequest = await friendRequestRepository
+            .GetPendingRequestAsync(userId, friendUserId);
 
         if (friendRequest is null)
         {
             friendRequest = new(userId, friendUserId, FriendshipStatus.Pending);
-            friendRequestRepository.Add(friendRequest);
 
             friendRequest.AddDomainEvent(new FriendRequestSentDomainEvent(friendRequest));
             return friendRequest;
         }
 
-        if (friendRequest.Status == FriendshipStatus.Rejected)
-        {
-            friendRequest.Status = FriendshipStatus.Pending;
-            friendRequestRepository.Update(friendRequest);
-
-            friendRequest.AddDomainEvent(new FriendRequestSentDomainEvent(friendRequest));
-            return friendRequest;
-        }
-
-        throw new FriendshipExistException("User already has pending or accepted request");
+        throw new FriendshipExistDomainException("User already has pending request");
     }
 
     public void AcceptFriendRequest()
     {
         if (Status != FriendshipStatus.Pending)
         {
-            throw new DomainException("Do not have any pending friend request");
+            throw new DomainException("Not a pending friend request");
         }
 
         Status = FriendshipStatus.Accepted;
 
         AddDomainEvent(new FriendRequestAcceptedDomainEvent(this));
+
     }
 
     public void RejectFriendRequest()
     {
-        if (Status == FriendshipStatus.Rejected)
+        if (Status != FriendshipStatus.Pending)
         {
-            throw new DomainException("Not an active friend");
+            throw new DomainException("Not an active friend request");
         }
 
         Status = FriendshipStatus.Rejected;

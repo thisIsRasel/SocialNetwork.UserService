@@ -1,29 +1,33 @@
 ﻿using MediatR;
-using UserService.Domain.Aggregates.FolloweeAggregate;
+using UserService.Domain.Aggregates.UserAggregate;
 
 namespace UserService.Api.Commands;
 
-public class UnfollowCommandHandler : IRequestHandler<UnfollowCommand>
+public class UnfollowCommandHandler
+    : IRequestHandler<UnfollowCommand>
 {
-    private readonly IFolloweeRepository _followeeRepository;
+    private readonly IUserRepository _userRepository;
 
     public UnfollowCommandHandler(
-        IFolloweeRepository followeeRepository)
+        IUserRepository userRepository)
     {
-        _followeeRepository = followeeRepository ?? throw new ArgumentNullException(nameof(followeeRepository));
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
+
     public async Task Handle(
         UnfollowCommand request,
         CancellationToken cancellationToken)
     {
-        var followee = await _followeeRepository
-            .GetAsync(request.UserId, request.FolloweeUserId)
-            ?? throw new InvalidOperationException("User is not followed");
+        var user = await _userRepository.GetAsync(request.UserId)
+            ?? throw new InvalidOperationException("Not a valid user");
 
-        followee.Unfollow();
-        _followeeRepository.Update(followee);
+        var followee = await _userRepository.GetAsync(request.FolloweeUserId)
+            ?? throw new InvalidOperationException("Not a valid followee");
 
-        await _followeeRepository.UnitOfWork
+        user.Unfollow(followee.Id);
+        _userRepository.Update(user);
+
+        await _userRepository.UnitOfWork
             .SaveEntitiesAsync(cancellationToken);
     }
 }

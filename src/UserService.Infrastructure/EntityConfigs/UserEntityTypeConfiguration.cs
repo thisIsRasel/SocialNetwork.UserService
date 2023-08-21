@@ -23,9 +23,9 @@ internal class UserEntityTypeConfiguration
             .HasForeignKey(f => f.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        //builder.HasMany(u => u.Followees)
-        //    .WithOne()
-        //    .HasForeignKey(u => u.UserId)
-        //    .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(u => u.Followers)
+            .WithOne()
+            .HasForeignKey(u => u.FollowerUserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

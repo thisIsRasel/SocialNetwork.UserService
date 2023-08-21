@@ -4,7 +4,7 @@ namespace UserService.Domain.Aggregates.FriendRequestAggregate;
 public interface IFriendRequestRepository 
     : IRepository<FriendRequest>
 {
-    Task<FriendRequest?> GetAsync(
+    Task<FriendRequest?> GetPendingRequestAsync(
         Guid userId,
         Guid friendUserId);
 

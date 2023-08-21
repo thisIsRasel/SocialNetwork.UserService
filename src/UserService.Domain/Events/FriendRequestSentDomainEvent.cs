@@ -4,8 +4,8 @@ using UserService.Domain.Aggregates.FriendRequestAggregate;
 namespace UserService.Domain.Events;
 public class FriendRequestSentDomainEvent : INotification
 {
-    public FriendRequest Friend { get; private set; }
+    public FriendRequest FriendRequest { get; private set; }
 
-    public FriendRequestSentDomainEvent(FriendRequest friend)
-        => Friend = friend;
+    public FriendRequestSentDomainEvent(FriendRequest friendRequest)
+        => FriendRequest = friendRequest;
 }

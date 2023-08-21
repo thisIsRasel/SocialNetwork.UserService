@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using UserService.Domain.Aggregates.UserAggregate;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using UserService.Api.Queries.GetToken;
 
 namespace UserService.Api.Controllers;
 
@@ -10,51 +8,18 @@ namespace UserService.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly IUserRepository _userRepository;
+    private readonly IMediator _mediator;
 
-    public AuthController(
-        IConfiguration configuration, 
-        IUserRepository userRepository)
+    public AuthController(IMediator mediator)
     {
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     [HttpPost("Token")]
     public async Task<IActionResult> GetToken([FromForm] string email)
     {
-        var user = await _userRepository.GetByEmailAsync(email);
-        if (user is null)
-        {
-            return BadRequest();
-        }
+        var result = await _mediator.Send(new GetTokenQuery(email));
 
-        var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!);
-        
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Claims = new Dictionary<string, object>
-            {
-                { "userId", user.Id },
-                { "name", user.Name },
-                { "email", user.Email }
-            },
-            Issuer = "me",
-            Audience = "you",
-            IssuedAt = DateTime.UtcNow,
-            Expires = DateTime.UtcNow.AddMinutes(30),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(tokenKey), 
-                SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-
-        return Ok(new
-        {
-            AccessToken = tokenHandler.WriteToken(securityToken)
-        });
+        return Ok(result);
     }
 }

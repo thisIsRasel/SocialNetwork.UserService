@@ -12,7 +12,7 @@ using UserService.Infrastructure;
 namespace UserService.Infrastructure.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230819203225_InitialMigration")]
+    [Migration("20230821154644_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,30 +25,9 @@ namespace UserService.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("UserService.Domain.Aggregates.FolloweeAggregate.Followee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("FollowStatus")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("FolloweeUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Followees", (string)null);
-                });
-
             modelBuilder.Entity("UserService.Domain.Aggregates.FriendRequestAggregate.FriendRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FriendUserId")
@@ -65,10 +44,28 @@ namespace UserService.Infrastructure.Migrations
                     b.ToTable("FriendRequests", (string)null);
                 });
 
-            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Friend", b =>
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Follower", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FolloweeUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FollowerUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FollowerUserId");
+
+                    b.ToTable("Followers");
+                });
+
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Friend", b =>
+                {
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FriendUserId")
@@ -87,7 +84,6 @@ namespace UserService.Infrastructure.Migrations
             modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -103,6 +99,15 @@ namespace UserService.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Follower", b =>
+                {
+                    b.HasOne("UserService.Domain.Aggregates.UserAggregate.User", null)
+                        .WithMany("Followers")
+                        .HasForeignKey("FollowerUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.Friend", b =>
                 {
                     b.HasOne("UserService.Domain.Aggregates.UserAggregate.User", null)
@@ -114,6 +119,8 @@ namespace UserService.Infrastructure.Migrations
 
             modelBuilder.Entity("UserService.Domain.Aggregates.UserAggregate.User", b =>
                 {
+                    b.Navigation("Followers");
+
                     b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618

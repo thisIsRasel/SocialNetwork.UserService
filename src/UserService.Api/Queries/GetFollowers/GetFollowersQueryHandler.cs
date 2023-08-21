@@ -25,9 +25,9 @@ public class GetFollowersQueryHandler
         connection.Open();
 
         var result = await connection.QueryAsync<dynamic>(
-            @"SELECT u.Name, f.UserId FROM followees f 
-                JOIN users u ON f.UserId = u.Id 
-                WHERE f.FollowStatus = 1 AND f.FolloweeUserId = @UserId
+            @"SELECT u.Name, f.FollowerUserId FROM followers f 
+                JOIN users u ON f.FollowerUserId = u.Id 
+                WHERE f.FolloweeUserId = @UserId
                 ORDER BY f.Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { request.UserId, limit, offset });
 
@@ -37,7 +37,7 @@ public class GetFollowersQueryHandler
         {
             followersQueryResponse.Followers.Add(new FollowerDto
             {
-                FollowerUserId = item.UserId.ToString(),
+                FollowerUserId = item.FollowerUserId.ToString(),
                 FollowerName = item.Name,
             });
         }

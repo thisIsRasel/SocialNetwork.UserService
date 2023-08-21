@@ -1,4 +1,4 @@
-﻿namespace UserService.Domain.Aggregates.FolloweeAggregate;
+﻿namespace UserService.Domain.Aggregates.UserAggregate;
 public enum FollowStatus
 {
     Followed = 1,

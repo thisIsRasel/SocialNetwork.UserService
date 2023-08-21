@@ -2,7 +2,7 @@
 using UserService.Domain.SeedWork;
 
 namespace UserService.Domain.Aggregates.UserAggregate;
-public partial class User : Entity, IAggregateRoot
+public class User : Entity, IAggregateRoot
 {
     public string Name { get; private set; }
 
@@ -11,12 +11,20 @@ public partial class User : Entity, IAggregateRoot
     private readonly List<Friend> _friends;
     public IReadOnlyCollection<Friend> Friends => _friends;
 
+    //private readonly List<Followee> _followees;
+    //public IReadOnlyCollection<Followee> Followees => _followees;
+
+    private readonly List<Follower> _followers;
+    public IReadOnlyCollection<Follower> Followers => _followers;
+
     private User(string name, string email)
     {
         Id = Guid.NewGuid();
         Name = !string.IsNullOrWhiteSpace(name) ? name : throw new DomainException(nameof(name));
         Email = !string.IsNullOrWhiteSpace(email) ? email : throw new DomainException(nameof(email));
         _friends = new List<Friend>();
+        //_followees = new List<Followee>();
+        _followers = new List<Follower>();
     }
 
     public static async Task<User> CreateAsync(
@@ -37,6 +45,11 @@ public partial class User : Entity, IAggregateRoot
 
     public void AddFriend(Guid friendUserId)
     {
+        if (Id == friendUserId)
+        {
+            throw new DomainException("User can not be his own friend");
+        }
+
         if (_friends.Any(f => f.FriendUserId == friendUserId))
         {
             throw new DomainException($"{friendUserId} is already a friend");
@@ -51,5 +64,68 @@ public partial class User : Entity, IAggregateRoot
             ?? throw new DomainException($"{friendUserId} is not a friend");
 
         _friends.Remove(friend);
+    }
+
+    //public void AddFollowee(Guid followeeUserId)
+    //{
+    //    if (Id == followeeUserId)
+    //    {
+    //        throw new DomainException("User can not follow himself");
+    //    }
+
+    //    var followee = _followees.FirstOrDefault(f => f.FolloweeUserId == followeeUserId);
+
+    //    if (followee is null)
+    //    {
+    //        followee = new(Id, followeeUserId, FollowStatus.Followed);
+    //        _followees.Add(followee);
+    //    }
+
+    //    if (followee.FollowStatus == FollowStatus.Unfollowed)
+    //    {
+    //        followee.Follow();
+    //    }
+
+    //    throw new AlreadyFollowedDomainException("User is already followed");
+    //}
+
+    //public void RemoveFollowee(Guid followeeUserId)
+    //{
+    //    var followee = _followees.FirstOrDefault(f => f.FolloweeUserId == followeeUserId)
+    //        ?? throw new DomainException($"{followeeUserId} is not a followee");
+
+    //    if (followee.FollowStatus == FollowStatus.Followed)
+    //    {
+    //        followee.Unfollow();
+    //    }
+
+    //    throw new DomainException("User is already unfollowed");
+    //}
+
+    public void Follow(Guid followeeUserId)
+    {
+        if (Id == followeeUserId)
+        {
+            throw new DomainException("User can not follow himself");
+        }
+
+        var follower = _followers.FirstOrDefault(f => f.FolloweeUserId == followeeUserId);
+
+        if (follower is null)
+        {
+            follower = new(followeeUserId, Id);
+            _followers.Add(follower);
+            return;
+        }
+
+        throw new AlreadyFollowedDomainException("User is already followed");
+    }
+
+    public void Unfollow(Guid followeeUserId)
+    {
+        var follower = _followers.FirstOrDefault(f => f.FolloweeUserId == followeeUserId)
+            ?? throw new DomainException($"{followeeUserId} is not a followee");
+
+        _followers.Remove(follower);
     }
 }

@@ -26,8 +26,8 @@ public class UserController : ControllerBase
 
     [HttpGet("Friends")]
     public async Task<IActionResult> GetFriendsAsync(
-        [FromQuery] string query,
-        [FromQuery] int page)
+        [FromQuery] string? query,
+        [FromQuery] int page = 1)
     {
         var userId = User.FindFirstValue("userId");
         if (string.IsNullOrWhiteSpace(userId))
@@ -45,8 +45,8 @@ public class UserController : ControllerBase
 
     [HttpGet("Followers")]
     public async Task<IActionResult> GetFollowersAsync(
-        [FromQuery] string query,
-        [FromQuery] int page)
+        [FromQuery] string? query,
+        [FromQuery] int page = 1)
     {
         var userId = User.FindFirstValue("userId");
         if (string.IsNullOrWhiteSpace(userId))
