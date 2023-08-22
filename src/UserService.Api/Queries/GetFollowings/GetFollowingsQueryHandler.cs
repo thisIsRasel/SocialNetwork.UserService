@@ -25,25 +25,17 @@ public class GetFollowingsQueryHandler
         var connection = new SqlConnection(_connectionString);
         connection.Open();
 
-        var result = await connection.QueryAsync<dynamic>(
-            @"SELECT u.Name, f.FolloweeUserId FROM Followers f
+        var followings = await connection.QueryAsync<FollowingDto>(
+            @"SELECT u.Name FolloweeName, f.FolloweeUserId FROM Followers f
                 JOIN Users u ON u.Id = f.FolloweeUserId
                 WHERE f.FollowerUserId = @UserId
                 ORDER BY f.Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { request.UserId, offset, limit }
             );
 
-        GetFollowingsQueryResponse response = new();
-
-        foreach(var item in result)
+        return new GetFollowingsQueryResponse
         {
-            response.Followings.Add(new FollowingDto
-            {
-                FolloweeUserId = item.FolloweeUserId,
-                FolloweeName = item.Name
-            });
-        }
-
-        return response;
+            Followings = followings.ToList(),
+        };
     }
 }

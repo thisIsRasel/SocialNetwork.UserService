@@ -2,7 +2,7 @@
 
 namespace UserService.Api.Queries.GetFriends;
 
-public class GetFriendsQuery : IRequest<FriendsQueryResponse>
+public class GetFriendsQuery : IRequest<GetFriendsQueryResponse>
 {
     public GetFriendsQuery(string userId, string? query, int page)
     {

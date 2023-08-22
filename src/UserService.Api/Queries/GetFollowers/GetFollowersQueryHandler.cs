@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 namespace UserService.Api.Queries.GetFollowers;
 
 public class GetFollowersQueryHandler
-    : IRequestHandler<GetFollowersQuery, FollowersQueryResponse>
+    : IRequestHandler<GetFollowersQuery, GetFollowersQueryResponse>
 {
     private readonly string _connectionString = string.Empty;
 
@@ -14,7 +14,7 @@ public class GetFollowersQueryHandler
         _connectionString = configuration.GetConnectionString("Default")!;
     }
 
-    public async Task<FollowersQueryResponse> Handle(
+    public async Task<GetFollowersQueryResponse> Handle(
         GetFollowersQuery request,
         CancellationToken cancellationToken)
     {
@@ -24,24 +24,16 @@ public class GetFollowersQueryHandler
         using var connection = new SqlConnection(_connectionString);
         connection.Open();
 
-        var result = await connection.QueryAsync<dynamic>(
-            @"SELECT u.Name, f.FollowerUserId FROM followers f 
+        var followers = await connection.QueryAsync<FollowerDto>(
+            @"SELECT u.Name FollowerName, f.FollowerUserId FROM Followers f 
                 JOIN users u ON f.FollowerUserId = u.Id 
                 WHERE f.FolloweeUserId = @UserId
                 ORDER BY f.Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { request.UserId, limit, offset });
 
-        var followersQueryResponse = new FollowersQueryResponse();
-
-        foreach (var item in result)
+        return new GetFollowersQueryResponse
         {
-            followersQueryResponse.Followers.Add(new FollowerDto
-            {
-                FollowerUserId = item.FollowerUserId.ToString(),
-                FollowerName = item.Name,
-            });
-        }
-
-        return followersQueryResponse;
+            Followers = followers.ToList()
+        };
     }
 }

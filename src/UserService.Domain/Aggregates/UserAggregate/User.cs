@@ -11,9 +11,6 @@ public class User : Entity, IAggregateRoot
     private readonly List<Friend> _friends;
     public IReadOnlyCollection<Friend> Friends => _friends;
 
-    //private readonly List<Followee> _followees;
-    //public IReadOnlyCollection<Followee> Followees => _followees;
-
     private readonly List<Follower> _followers;
     public IReadOnlyCollection<Follower> Followers => _followers;
 
@@ -23,7 +20,6 @@ public class User : Entity, IAggregateRoot
         Name = !string.IsNullOrWhiteSpace(name) ? name : throw new DomainException(nameof(name));
         Email = !string.IsNullOrWhiteSpace(email) ? email : throw new DomainException(nameof(email));
         _friends = new List<Friend>();
-        //_followees = new List<Followee>();
         _followers = new List<Follower>();
     }
 
@@ -65,42 +61,6 @@ public class User : Entity, IAggregateRoot
 
         _friends.Remove(friend);
     }
-
-    //public void AddFollowee(Guid followeeUserId)
-    //{
-    //    if (Id == followeeUserId)
-    //    {
-    //        throw new DomainException("User can not follow himself");
-    //    }
-
-    //    var followee = _followees.FirstOrDefault(f => f.FolloweeUserId == followeeUserId);
-
-    //    if (followee is null)
-    //    {
-    //        followee = new(Id, followeeUserId, FollowStatus.Followed);
-    //        _followees.Add(followee);
-    //    }
-
-    //    if (followee.FollowStatus == FollowStatus.Unfollowed)
-    //    {
-    //        followee.Follow();
-    //    }
-
-    //    throw new AlreadyFollowedDomainException("User is already followed");
-    //}
-
-    //public void RemoveFollowee(Guid followeeUserId)
-    //{
-    //    var followee = _followees.FirstOrDefault(f => f.FolloweeUserId == followeeUserId)
-    //        ?? throw new DomainException($"{followeeUserId} is not a followee");
-
-    //    if (followee.FollowStatus == FollowStatus.Followed)
-    //    {
-    //        followee.Unfollow();
-    //    }
-
-    //    throw new DomainException("User is already unfollowed");
-    //}
 
     public void Follow(Guid followeeUserId)
     {

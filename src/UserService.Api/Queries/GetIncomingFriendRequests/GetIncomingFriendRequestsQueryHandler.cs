@@ -24,24 +24,16 @@ public class GetIncomingFriendRequestsQueryHandler
         using var connection = new SqlConnection(_connectionString);
         connection.Open();
 
-        var result = await connection.QueryAsync<dynamic>(
+        var friendRequests = await connection.QueryAsync<IncomingFriendRequestDto>(
             @"SELECT u.Name, fr.UserId FROM FriendRequests fr 
                 JOIN users u ON fr.UserId = u.Id 
                 WHERE fr.FriendUserId = @UserId AND fr.Status = 1
                 ORDER BY fr.Id
                 OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY", new { request.UserId, limit, offset });
 
-        GetIncomingFriendRequestsQueryResponse response = new();
-
-        foreach (var item in result)
+        return new GetIncomingFriendRequestsQueryResponse
         {
-            response.FriendRequests.Add(new IncomingFriendRequestDto
-            {
-                UserId = item.UserId,
-                Name = item.Name,
-            });
-        }
-
-        return response;
+            FriendRequests = friendRequests.ToList(),
+        };
     }
 }

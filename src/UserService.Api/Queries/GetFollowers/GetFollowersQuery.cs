@@ -2,7 +2,7 @@
 
 namespace UserService.Api.Queries.GetFollowers;
 
-public class GetFollowersQuery : IRequest<FollowersQueryResponse>
+public class GetFollowersQuery : IRequest<GetFollowersQueryResponse>
 {
     public GetFollowersQuery(string userId, string? query, int page)
     {
